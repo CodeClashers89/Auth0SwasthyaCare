@@ -14,7 +14,7 @@ class PatientRegistrationForm(forms.ModelForm):
     
     class Meta:
         model = Patient
-        fields = ['date_of_birth', 'gender', 'address', 'blood_group', 'allergies', 
+        fields = ['date_of_birth', 'gender', 'address', 'phone_number', 'blood_group', 'allergies', 
                   'chronic_diseases', 'previous_surgeries', 'emergency_contact_name', 
                   'emergency_contact_phone']
         widgets = {

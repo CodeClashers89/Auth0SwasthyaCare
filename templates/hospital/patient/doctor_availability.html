@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block title %}Doctor Availability - SwasthyaCare{% endblock %}
 
@@ -18,8 +18,7 @@
                     <select name="doctor" id="doctor" class="form-control" required>
                         <option value="">-- Select a doctor --</option>
                         {% for doctor in doctors %}
-                        <option value="{{ doctor.id }}" {% if selected_doctor_id==doctor.id|stringformat:"s"
-                            %}selected{% endif %}>
+                        <option value="{{ doctor.id }}" {% if selected_doctor_id == doctor.id %}selected{% endif %}>
                             Dr. {{ doctor.user.get_full_name }} - {{ doctor.specialization }}
                         </option>
                         {% endfor %}

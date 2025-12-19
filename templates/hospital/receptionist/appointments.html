@@ -15,11 +15,11 @@
             <form method="get" style="display: flex; gap: 0.5rem; align-items: center;">
                 <input type="date" name="date" value="{{ date_filter }}" class="form-control" style="width: auto;">
                 <select name="status" class="form-control" style="width: auto;">
-                    <option value="all" {% if status_filter=='all' %}selected{% endif %}>All Status</option>
-                    <option value="scheduled" {% if status_filter=='scheduled' %}selected{% endif %}>Scheduled</option>
-                    <option value="completed" {% if status_filter=='completed' %}selected{% endif %}>Completed</option>
-                    <option value="cancelled" {% if status_filter=='cancelled' %}selected{% endif %}>Cancelled</option>
-                    <option value="no_show" {% if status_filter=='no_show' %}selected{% endif %}>No Show</option>
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                    <option value="scheduled" {% if status_filter == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    <option value="no_show" {% if status_filter == 'no_show' %}selected{% endif %}>No Show</option>
                 </select>
                 <button type="submit" class="btn btn-sm btn-primary">Filter</button>
                 <a href="{% url 'hospital:receptionist_appointments' %}" class="btn btn-sm btn-secondary">Clear</a>
