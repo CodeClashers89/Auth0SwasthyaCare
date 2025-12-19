@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}My Surgeries - SwasthyaCare{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">My Surgeries</h1>
+    <p class="page-subtitle">View all scheduled surgeries</p>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">Upcoming Surgeries</div>
+    <div class="card-body">
+        {% if upcoming_surgeries %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Surgery Type</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for surgery in upcoming_surgeries %}
+                    <tr>
+                        <td><strong>{{ surgery.surgery_type }}</strong></td>
+                        <td>{{ surgery.patient_name }}</td>
+                        <td>{{ surgery.surgery_date }}</td>
+                        <td>
+                            {{ surgery.start_time|time:"h:i A" }} - {{ surgery.end_time|time:"h:i A" }}
+                        </td>
+                        <td>
+                            {% if surgery.status == 'APPROVED' %}
+                            <span class="badge badge-success">{{ surgery.get_status_display }}</span>
+                            {% elif surgery.status == 'PENDING' %}
+                            <span class="badge badge-warning">{{ surgery.get_status_display }}</span>
+                            {% else %}
+                            <span class="badge badge-{{ surgery.status|lower }}">{{ surgery.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ surgery.notes|truncatewords:10|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📅</div>
+            <p class="empty-state-text">No upcoming surgeries scheduled</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Past Surgeries (Last 10)</div>
+    <div class="card-body">
+        {% if past_surgeries %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Surgery Type</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for surgery in past_surgeries %}
+                    <tr style="opacity: 0.7;">
+                        <td><strong>{{ surgery.surgery_type }}</strong></td>
+                        <td>{{ surgery.patient_name }}</td>
+                        <td>{{ surgery.surgery_date }}</td>
+                        <td>
+                            {{ surgery.start_time|time:"h:i A" }} - {{ surgery.end_time|time:"h:i A" }}
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ surgery.status|lower }}">{{ surgery.get_status_display }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p class="empty-state-text">No past surgeries</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="flex-between mt-3">
+    <a href="{% url 'hospital:doctor_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    <a href="{% url 'hospital:create_urgent_surgery_doctor' %}" class="btn btn-danger">🚨 Schedule New Surgery</a>
+</div>
+{% endblock %}
