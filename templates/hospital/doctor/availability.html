@@ -8,7 +8,7 @@
     <p class="page-subtitle">Set lunch breaks and unavailable times</p>
 </div>
 
-<div class="grid grid-2">
+<div style="display: grid; grid-template-columns: 1fr 3fr; gap: 1.5rem;">
     <div class="card">
         <div class="card-header">Add Unavailability</div>
         <div class="card-body">
@@ -21,8 +21,15 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.date.id_for_label }}" class="form-label">Date *</label>
+                    <label for="{{ form.is_recurring.id_for_label }}" class="form-label">Recurring (Everyday)</label>
+                    {{ form.is_recurring }}
+                    <small class="form-help">Check this for everday unavailiblities.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
                     {{ form.date }}
+                    <small class="form-help">Leave empty for recurring lunch breaks</small>
                 </div>
 
                 <div class="form-group">
@@ -67,13 +74,20 @@
                             <th>Date</th>
                             <th>Type</th>
                             <th>Time</th>
+                            <th>Reason</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for availability in availabilities %}
                         <tr>
-                            <td>{{ availability.date }}</td>
+                            <td>
+                                {% if availability.is_recurring %}
+                                <strong style="color: var(--primary-color);">Everyday</strong>
+                                {% else %}
+                                {{ availability.date }}
+                                {% endif %}
+                            </td>
                             <td>
                                 <span
                                     class="badge {% if availability.availability_type == 'LUNCH' %}badge-warning{% else %}badge-danger{% endif %}">
@@ -82,6 +96,7 @@
                             </td>
                             <td>{{ availability.start_time|time:"h:i A" }} - {{ availability.end_time|time:"h:i A" }}
                             </td>
+                            <td>{{ availability.reason|default:"Not specified" }}</td>
                             <td>
                                 <a href="{% url 'hospital:delete_availability' availability.id %}"
                                     class="btn btn-sm btn-danger"

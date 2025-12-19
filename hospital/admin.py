@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Patient, Doctor, Appointment, MedicalRecord, DoctorAvailability
+from .models import (CustomUser, Patient, Doctor, Appointment, MedicalRecord, 
+                     DoctorAvailability, UrgentSurgery, Notification, AppointmentReschedule)
 
 
 @admin.register(CustomUser)
@@ -65,3 +66,29 @@ class MedicalRecordAdmin(admin.ModelAdmin):
     list_filter = ['created_at', 'doctor']
     search_fields = ['patient__patient_id', 'patient__user__first_name', 'diagnosis']
     readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(UrgentSurgery)
+class UrgentSurgeryAdmin(admin.ModelAdmin):
+    """Urgent Surgery Admin"""
+    list_display = ['surgery_type', 'doctor', 'patient_name', 'surgery_date', 'start_time', 'end_time', 'status', 'created_by']
+    list_filter = ['status', 'surgery_date', 'created_at']
+    search_fields = ['surgery_type', 'patient_name', 'doctor__user__first_name', 'created_by__username']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    """Notification Admin"""
+    list_display = ['title', 'recipient', 'notification_type', 'is_read', 'created_at']
+    list_filter = ['notification_type', 'is_read', 'created_at']
+    search_fields = ['title', 'message', 'recipient__username']
+
+
+@admin.register(AppointmentReschedule)
+class AppointmentRescheduleAdmin(admin.ModelAdmin):
+    """Appointment Reschedule Admin"""
+    list_display = ['appointment', 'original_date', 'original_time', 'new_date', 'new_time', 'rescheduled_by', 'created_at']
+    list_filter = ['created_at', 'original_date', 'new_date']
+    search_fields = ['appointment__patient__patient_id', 'reason']
+

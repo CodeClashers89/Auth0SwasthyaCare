@@ -5,8 +5,8 @@
 {% block content %}
 <div class="page-header">
     <h1 class="page-title">Create Follow-up Appointment</h1>
-    <p class="page-subtitle">For {{ parent_appointment.patient.patient_id }} - {{
-        parent_appointment.patient.user.get_full_name }}</p>
+    <p class="page-subtitle">For {{ parent_appointment.patient.patient_id }} -
+        {{parent_appointment.patient.user.get_full_name }}</p>
 </div>
 
 <div class="card">
@@ -15,8 +15,8 @@
         <ul class="info-list">
             <li>
                 <span class="info-label">Original Date</span>
-                <span class="info-value">{{ parent_appointment.appointment_date }} at {{
-                    parent_appointment.appointment_time|time:"h:i A" }}</span>
+                <span class="info-value">{{ parent_appointment.appointment_date }} at
+                    {{parent_appointment.appointment_time|time:"h:i A" }}</span>
             </li>
             <li>
                 <span class="info-label">Reason</span>
