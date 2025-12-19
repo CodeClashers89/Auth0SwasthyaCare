@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, time
 from .models import (CustomUser, Patient, Doctor, Appointment, MedicalRecord, 
                      DoctorAvailability, UrgentSurgery, Notification, AppointmentReschedule)
 from .forms import (PatientRegistrationForm, AppointmentForm, MedicalRecordForm, 
@@ -275,171 +275,74 @@ def delete_availability(request, availability_id):
     messages.success(request, 'Availability record deleted.')
     return redirect('hospital:manage_availability')
 
+#Patient Views
+@login_required
+@role_required('PATIENT')
+def patient_dashboard(request):
+    """Patient dashboard with appointment history"""
+    patient = request.user.patient_profile
+    
+    # Get appointment history
+    appointments = Appointment.objects.filter(patient=patient).order_by('-appointment_date', '-appointment_time')
+    
+    # Get medical records
+    medical_records = MedicalRecord.objects.filter(patient=patient).order_by('-created_at')
+    
+    context = {
+        'patient': patient,
+        'appointments': appointments,
+        'medical_records': medical_records,
+    }
+    return render(request, 'hospital/patient/dashboard.html', context)
+
+
+@login_required
+@role_required('PATIENT')
+def check_doctor_availability(request):
+    """Check doctor availability"""
+    doctors = Doctor.objects.all().order_by('user__first_name')
+    
+    selected_doctor_id = request.GET.get('doctor')
+    selected_date = request.GET.get('date')
+    
+    availability_info = None
+    
+    if selected_doctor_id and selected_date:
+        try:
+            doctor = Doctor.objects.get(id=selected_doctor_id)
+            check_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+            
+            # Get unavailable times (both date-specific and recurring)
+            unavailable_times = DoctorAvailability.objects.filter(
+                Q(doctor=doctor, date=check_date) |
+                Q(doctor=doctor, is_recurring=True)
+            ).order_by('start_time')
+            
+            # Get booked appointments
+            booked_appointments = Appointment.objects.filter(
+                doctor=doctor,
+                appointment_date=check_date,
+                status='SCHEDULED'
+            ).order_by('appointment_time')
+            
+            availability_info = {
+                'doctor': doctor,
+                'date': check_date,
+                'unavailable_times': unavailable_times,
+                'booked_appointments': booked_appointments,
+            }
+        except (Doctor.DoesNotExist, ValueError):
+            messages.error(request, 'Invalid doctor or date.')
+    
+    context = {
+        'doctors': doctors,
+        'selected_doctor_id': selected_doctor_id,
+        'selected_date': selected_date,
+        'availability_info': availability_info,
+    }
+    return render(request, 'hospital/patient/doctor_availability.html', context)
 
 # Receptionist Views
-@login_required
-@role_required('RECEPTIONIST')
-def receptionist_dashboard(request):
-    """Receptionist dashboard"""
-    today = date.today()
-    today_appointments = Appointment.objects.filter(
-        appointment_date=today
-    ).order_by('appointment_time')
-    
-    recent_patients = Patient.objects.all().order_by('-created_at')[:5]
-    
-    context = {
-        'today_appointments': today_appointments,
-        'recent_patients': recent_patients,
-    }
-    return render(request, 'hospital/receptionist/dashboard.html', context)
-
-
-@login_required
-@role_required('RECEPTIONIST')
-def register_patient(request):
-    """Register new patient"""
-    if request.method == 'POST':
-        form = PatientRegistrationForm(request.POST)
-        if form.is_valid():
-            patient = form.save()
-            messages.success(request, f'Patient registered successfully! Patient ID: {patient.patient_id}')
-            return redirect('hospital:receptionist_dashboard')
-    else:
-        form = PatientRegistrationForm()
-    
-    context = {'form': form}
-    return render(request, 'hospital/receptionist/register_patient.html', context)
-
-
-@login_required
-@role_required('RECEPTIONIST')
-def receptionist_appointments(request):
-    """View all appointments"""
-    date_filter = request.GET.get('date', '')
-    status_filter = request.GET.get('status', 'all')
-    
-    appointments = Appointment.objects.all()
-    
-    if date_filter:
-        try:
-            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-            appointments = appointments.filter(appointment_date=filter_date)
-        except ValueError:
-            pass
-    
-    if status_filter != 'all':
-        appointments = appointments.filter(status=status_filter.upper())
-    
-    appointments = appointments.order_by('-appointment_date', '-appointment_time')
-    
-    context = {
-        'appointments': appointments,
-        'date_filter': date_filter,
-        'status_filter': status_filter,
-    }
-    return render(request, 'hospital/receptionist/appointments.html', context)
-
-
-@login_required
-@role_required('RECEPTIONIST')
-def create_appointment(request):
-    """Create new appointment"""
-    if request.method == 'POST':
-        form = AppointmentForm(request.POST)
-        if form.is_valid():
-            appointment = form.save(commit=False)
-            appointment.created_by = request.user
-            
-            # Check doctor availability
-            doctor = appointment.doctor
-            app_date = appointment.appointment_date
-            app_time = appointment.appointment_time
-            
-            # Check if doctor has marked this time as unavailable (date-specific or recurring)
-            unavailable = DoctorAvailability.objects.filter(
-                Q(doctor=doctor, date=app_date, start_time__lte=app_time, end_time__gt=app_time) |
-                Q(doctor=doctor, is_recurring=True, start_time__lte=app_time, end_time__gt=app_time)
-            ).exists()
-            
-            if unavailable:
-                messages.error(request, 'Doctor is not available at this time.')
-                return render(request, 'hospital/receptionist/create_appointment.html', {'form': form})
-            
-            # Check for duplicate appointments
-            duplicate = Appointment.objects.filter(
-                doctor=doctor,
-                appointment_date=app_date,
-                appointment_time=app_time,
-                status='SCHEDULED'
-            ).exists()
-            
-            if duplicate:
-                messages.error(request, 'This time slot is already booked.')
-                return render(request, 'hospital/receptionist/create_appointment.html', {'form': form})
-            
-            appointment.save()
-            messages.success(request, 'Appointment created successfully.')
-            return redirect('hospital:receptionist_appointments')
-    else:
-        form = AppointmentForm()
-    
-    context = {'form': form}
-    return render(request, 'hospital/receptionist/create_appointment.html', context)
-
-
-@login_required
-@role_required('RECEPTIONIST')
-def reschedule_appointment(request, appointment_id):
-    """Reschedule an appointment"""
-    appointment = get_object_or_404(Appointment, id=appointment_id)
-    
-    if request.method == 'POST':
-        form = RescheduleAppointmentForm(request.POST, instance=appointment)
-        if form.is_valid():
-            updated_appointment = form.save(commit=False)
-            
-            # Check availability
-            doctor = updated_appointment.doctor
-            app_date = updated_appointment.appointment_date
-            app_time = updated_appointment.appointment_time
-            
-            # Check for both date-specific and recurring unavailability
-            unavailable = DoctorAvailability.objects.filter(
-                Q(doctor=doctor, date=app_date, start_time__lte=app_time, end_time__gt=app_time) |
-                Q(doctor=doctor, is_recurring=True, start_time__lte=app_time, end_time__gt=app_time)
-            ).exists()
-            
-            if unavailable:
-                messages.error(request, 'Doctor is not available at this time.')
-                return render(request, 'hospital/receptionist/reschedule_appointment.html', 
-                            {'form': form, 'appointment': appointment})
-            
-            updated_appointment.save()
-            messages.success(request, 'Appointment rescheduled successfully.')
-            return redirect('hospital:receptionist_appointments')
-    else:
-        form = RescheduleAppointmentForm(instance=appointment)
-    
-    context = {
-        'form': form,
-        'appointment': appointment,
-    }
-    return render(request, 'hospital/receptionist/reschedule_appointment.html', context)
-
-
-@login_required
-@role_required('RECEPTIONIST')
-def cancel_appointment(request, appointment_id):
-    """Cancel an appointment"""
-    appointment = get_object_or_404(Appointment, id=appointment_id)
-    appointment.status = 'CANCELLED'
-    appointment.save()
-    messages.success(request, 'Appointment cancelled successfully.')
-    return redirect('hospital:receptionist_appointments')
-
-
-# Patient Views
 @login_required
 @role_required('RECEPTIONIST')
 def receptionist_dashboard(request):
