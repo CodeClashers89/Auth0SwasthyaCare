@@ -1,57 +1,294 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}Create Follow-up Appointment - SwasthyaCare{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>Create Follow-up Appointment - SwasthyaCare</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% block content %}
-<div class="page-header">
-    <h1 class="page-title">Create Follow-up Appointment</h1>
-    <p class="page-subtitle">For {{ parent_appointment.patient.patient_id }} -
-        {{parent_appointment.patient.user.get_full_name }}</p>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            background-color: #e6fff7;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background-color: #64cbab;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+            color: white;
+        }
+
+        .navbar-brand {
+            font-size: 32px;
+            font-weight: 500;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            padding: 40px 60px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        /* HEADER */
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: #666;
+        }
+
+        /* CARD */
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            background-color: #9ac2ea;
+            color: white;
+            padding: 20px 30px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        /* INFO LIST */
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            min-width: 200px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .info-value {
+            color: #555;
+        }
+
+        /* FORM */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #64cbab;
+        }
+
+        /* BUTTONS */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 35px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-success {
+            background-color: #64cbab;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #52b899;
+        }
+
+        .btn-secondary {
+            background-color: #b5b5b5;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #9a9a9a;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .info-list li {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .info-label {
+                min-width: auto;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="navbar-brand">Swasthya Care</div>
 </div>
 
-<div class="card">
-    <div class="card-header">Parent Appointment Details</div>
-    <div class="card-body">
-        <ul class="info-list">
-            <li>
-                <span class="info-label">Original Date</span>
-                <span class="info-value">{{ parent_appointment.appointment_date }} at
-                    {{parent_appointment.appointment_time|time:"h:i A" }}</span>
-            </li>
-            <li>
-                <span class="info-label">Reason</span>
-                <span class="info-value">{{ parent_appointment.reason }}</span>
-            </li>
-        </ul>
+<!-- MAIN -->
+<div class="main-content">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">Create Follow-up Appointment</h1>
+        <p class="page-subtitle">
+            For {{ parent_appointment.patient.patient_id }} –
+            {{ parent_appointment.patient.user.get_full_name }}
+        </p>
     </div>
-</div>
 
-<div class="card mt-3">
-    <div class="card-header">Follow-up Appointment Form</div>
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="{{ form.appointment_date.id_for_label }}" class="form-label">Follow-up Date *</label>
-                {{ form.appointment_date }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.appointment_time.id_for_label }}" class="form-label">Follow-up Time *</label>
-                {{ form.appointment_time }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.reason.id_for_label }}" class="form-label">Reason for Follow-up *</label>
-                {{ form.reason }}
-            </div>
-
-            <div class="flex-gap mt-3">
-                <button type="submit" class="btn btn-success">Create Follow-up</button>
-                <a href="{% url 'hospital:doctor_appointments' %}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
+    <!-- Parent Appointment Details -->
+    <div class="card">
+        <div class="card-header">Parent Appointment Details</div>
+        <div class="card-body">
+            <ul class="info-list">
+                <li>
+                    <span class="info-label">Original Date</span>
+                    <span class="info-value">
+                        {{ parent_appointment.appointment_date }}
+                        at {{ parent_appointment.appointment_time|time:"h:i A" }}
+                    </span>
+                </li>
+                <li>
+                    <span class="info-label">Reason</span>
+                    <span class="info-value">
+                        {{ parent_appointment.reason }}
+                    </span>
+                </li>
+            </ul>
+        </div>
     </div>
+
+    <!-- Follow-up Form -->
+    <div class="card">
+        <div class="card-header">Follow-up Appointment Form</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label">Follow-up Date *</label>
+                    {{ form.appointment_date }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Follow-up Time *</label>
+                    {{ form.appointment_time }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Reason for Follow-up *</label>
+                    {{ form.reason }}
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">
+                        Create Follow-up
+                    </button>
+                    <a href="{% url 'hospital:doctor_appointments' %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
-{% endblock %}
+
+</body>
+</html>
