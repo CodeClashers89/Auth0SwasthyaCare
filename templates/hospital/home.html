@@ -17,10 +17,19 @@
     }
 
     body {
-      background: #fcfcfc;
       font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
       line-height: 1.6;
+      overflow-x: hidden;
+
+      /* ✅ BACKGROUND IMAGE */
+      background:
+         /* linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),  */
+        url("https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1920&q=80");
+
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
     }
 
     /* ========== NAVBAR ========== */
@@ -69,7 +78,7 @@
     /* ========== HERO SECTION ========== */
     .hero-section {
       margin-top: 117px;
-      background: rgba(211, 255, 240, 0.53);
+      /* background: rgba(211, 255, 240, 0.53); */
       width: 100%;
       min-height: 712px;
       display: flex;
@@ -77,14 +86,14 @@
       justify-content: center;
       position: relative;
       padding: 60px 120px;
-      
+
     }
 
     .hero-container {
       max-width: 1200px;
       width: 100%;
       position: relative;
-      
+
     }
 
     .welcome-card {
@@ -143,7 +152,7 @@
 
     /* ========== STATISTICS SECTION ========== */
     .stats-section {
-      background: rgba(211, 255, 240, 0.53);
+      /* background: rgba(211, 255, 240, 0.53); */
       padding: 80px 120px;
     }
 
@@ -198,7 +207,7 @@
 
     /* ========== ABOUT & SERVICES SECTIONS ========== */
     .content-section {
-      background: rgba(211, 255, 240, 0.53);
+      /* background: rgba(211, 255, 240, 0.53); */
       padding: 100px 120px;
       display: flex;
       gap: 80px;
@@ -227,7 +236,7 @@
     }
 
     .content-box {
-      background:  rgba(90, 198, 162, 0.89);
+      background: rgba(90, 198, 162, 0.89);
       padding: 50px;
       border-radius: 20px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
