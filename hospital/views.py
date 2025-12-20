@@ -14,6 +14,9 @@ from django.db import IntegrityError
 
 
 # Authentication Views
+def start(request):
+    return render(request, 'hospital/home.html')
+
 def login_view(request):
     """Login view for all users"""
     if request.user.is_authenticated:

@@ -5,7 +5,8 @@ app_name = 'hospital'
 
 urlpatterns = [
     # Authentication
-    path('', views.login_view, name='login'),
+    path('', views.start, name='start'),
+    path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('home/', views.home_view, name='home'),
     
