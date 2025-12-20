@@ -173,6 +173,7 @@ def add_medical_record(request, appointment_id):
         'form': form,
         'appointment': appointment,
         'medical_record': existing_record,  # Pass existing record if available
+        'doctor': doctor,  # Add doctor to context
     }
     return render(request, 'hospital/doctor/add_record.html', context)
 
