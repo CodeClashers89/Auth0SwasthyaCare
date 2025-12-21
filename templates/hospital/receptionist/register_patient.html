@@ -1,145 +1,396 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}Register Patient - SwasthyaCare{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>Register Patient - SwasthyaCare</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% block content %}
-<div class="page-header">
-    <h1 class="page-title">Register New Patient</h1>
-    <p class="page-subtitle">Create a new patient profile with medical information</p>
-</div>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
-<div class="card">
-    <div class="card-header">Patient Registration Form</div>
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
+    <style>
+        :root {
+            --primary-color: #66cdaa;
+            --primary-dark: #3cb371;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e0e0e0;
+            --bg-body: #f8f9fa;
+            --bg-card: #ffffff;
+            --danger-color: #dc3545;
+        }
 
-            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Account Information</h3>
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-            <div class="grid grid-2">
-                <div class="form-group">
-                    <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name *</label>
-                    {{ form.first_name }}
-                </div>
+        body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+        }
 
-                <div class="form-group">
-                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name *</label>
-                    {{ form.last_name }}
-                </div>
+        /* Navbar */
+        .top-bar {
+            width: 100%;
+            height: 90px;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            padding: 0 3rem;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #64cbab;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+            color: #fff;
+        }
+
+        .navbar-brand {
+            font-size: 28px;
+            font-weight: 600
+        }
+
+        .navbar-center {
+            display: flex;
+            gap: 40px
+        }
+
+        .navbar-center a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 15px;
+            align-items: center
+        }
+
+        .btn-logout {
+            background: #ef4444;
+            padding: 8px 18px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Card */
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 205, 170, 0.15);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .form-help {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 2rem 0;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Buttons */
+        .flex-gap {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.75rem;
+            border-radius: 6px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .btn-success {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }
+
+        /* Errors */
+        .alert-error {
+            background: #fdecea;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">SwasthyaCare</div>
+        <div class="navbar-center">
+            <a href="{% url 'hospital:receptionist_dashboard' %}">Dashboard</a>
+            <a href="{% url 'hospital:register_patient' %}">Register Patient</a>
+            <a href="{% url 'hospital:create_appointment' %}">New Appointment</a>
+            <a href="{% url 'hospital:receptionist_appointments' %}">All Appointments</a>
+        </div>
+        <div class="navbar-right">
+            {{ user.get_full_name }}
+            <a href="{% url 'hospital:logout' %}" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Register New Patient</h1>
+            <p class="page-subtitle">Create a new patient profile with medical information</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Patient Registration Form</div>
+            <div class="card-body">
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Account Info -->
+                    <h3>Account Information</h3>
+
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label class="form-label">First Name *</label>
+                            {{ form.first_name }}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Last Name *</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Username *</label>
+                            {{ form.username }}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email *</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password *</label>
+                        {{ form.password }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        {{ form.phone_number }}
+                    </div>
+
+                    <hr>
+
+                    <!-- Personal Info -->
+                    <h3>Personal Information</h3>
+
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth *</label>
+                            {{ form.date_of_birth }}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Gender *</label>
+                            {{ form.gender }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Address *</label>
+                        {{ form.address }}
+                    </div>
+
+                    <hr>
+
+                    <!-- Medical Info -->
+                    <h3>Medical Information</h3>
+
+                    <div class="form-group">
+                        <label class="form-label">Blood Group</label>
+                        {{ form.blood_group }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Allergies</label>
+                        {{ form.allergies }}
+                        <small class="form-help">{{ form.allergies.help_text }}</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Chronic Diseases</label>
+                        {{ form.chronic_diseases }}
+                        <small class="form-help">{{ form.chronic_diseases.help_text }}</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Previous Surgeries</label>
+                        {{ form.previous_surgeries }}
+                        <small class="form-help">{{ form.previous_surgeries.help_text }}</small>
+                    </div>
+
+                    <hr>
+
+                    <!-- Emergency -->
+                    <h3>Emergency Contact</h3>
+
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Contact Name *</label>
+                            {{ form.emergency_contact_name }}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Contact Phone *</label>
+                            {{ form.emergency_contact_phone }}
+                        </div>
+                    </div>
+
+                    {% if form.errors %}
+                    <div class="alert-error">
+                        <strong>Please fix the following errors:</strong>
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                            <li>{{ field }} : {{ error }}</li>
+                            {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div class="flex-gap">
+                        <button type="submit" class="btn btn-success">Register Patient</button>
+                        <a href="{% url 'hospital:receptionist_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+
+                </form>
+
             </div>
-
-            <div class="grid grid-2">
-                <div class="form-group">
-                    <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
-                    {{ form.username }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
-                    {{ form.email }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.password.id_for_label }}" class="form-label">Password *</label>
-                {{ form.password }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number *</label>
-                {{ form.phone_number }}
-            </div>
-
-            <hr style="margin: 2rem 0; border: none; border-top: 2px solid var(--border-color);">
-
-            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Personal Information</h3>
-
-            <div class="grid grid-2">
-                <div class="form-group">
-                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth *</label>
-                    {{ form.date_of_birth }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.gender.id_for_label }}" class="form-label">Gender *</label>
-                    {{ form.gender }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.address.id_for_label }}" class="form-label">Address *</label>
-                {{ form.address }}
-            </div>
-
-            <hr style="margin: 2rem 0; border: none; border-top: 2px solid var(--border-color);">
-
-            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Medical Information</h3>
-
-            <div class="form-group">
-                <label for="{{ form.blood_group.id_for_label }}" class="form-label">Blood Group</label>
-                {{ form.blood_group }}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.allergies.id_for_label }}" class="form-label">Allergies</label>
-                {{ form.allergies }}
-                {% if form.allergies.help_text %}
-                <small class="form-help">{{ form.allergies.help_text }}</small>
-                {% endif %}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.chronic_diseases.id_for_label }}" class="form-label">Chronic Diseases</label>
-                {{ form.chronic_diseases }}
-                {% if form.chronic_diseases.help_text %}
-                <small class="form-help">{{ form.chronic_diseases.help_text }}</small>
-                {% endif %}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.previous_surgeries.id_for_label }}" class="form-label">Previous Surgeries</label>
-                {{ form.previous_surgeries }}
-                {% if form.previous_surgeries.help_text %}
-                <small class="form-help">{{ form.previous_surgeries.help_text }}</small>
-                {% endif %}
-            </div>
-
-            <hr style="margin: 2rem 0; border: none; border-top: 2px solid var(--border-color);">
-
-            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Emergency Contact</h3>
-
-            <div class="grid grid-2">
-                <div class="form-group">
-                    <label for="{{ form.emergency_contact_name.id_for_label }}" class="form-label">Emergency Contact
-                        Name *</label>
-                    {{ form.emergency_contact_name }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.emergency_contact_phone.id_for_label }}" class="form-label">Emergency Contact
-                        Phone *</label>
-                    {{ form.emergency_contact_phone }}
-                </div>
-            </div>
-
-            {% if form.errors %}
-            <div class="alert alert-error">
-                <strong>Please correct the following errors:</strong>
-                <ul style="margin: 0.5rem 0 0 1.5rem;">
-                    {% for field, errors in form.errors.items %}
-                    {% for error in errors %}
-                    <li>{{ field }}: {{ error }}</li>
-                    {% endfor %}
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-
-            <div class="flex-gap mt-3">
-                <button type="submit" class="btn btn-success btn-lg">Register Patient</button>
-                <a href="{% url 'hospital:receptionist_dashboard' %}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-{% endblock %}
+
+</body>
+
+</html>
