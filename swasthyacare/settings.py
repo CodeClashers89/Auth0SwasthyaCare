@@ -145,5 +145,13 @@ EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'  # This is always 'apikey' for SendGrid
-EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")  # Replace with your actual API key
-DEFAULT_FROM_EMAIL = os.environ.get("SENDGRID_FROM_EMAIL")  # Replace with verified sender email
+EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY", "")  # Your SendGrid API key
+DEFAULT_FROM_EMAIL = os.environ.get("SENDGRID_FROM_EMAIL", "noreply@example.com")  # Your verified sender email
+
+# Validate email configuration
+if not EMAIL_HOST_PASSWORD:
+    import warnings
+    warnings.warn("SENDGRID_API_KEY environment variable is not set. Emails will fail to send.")
+    # Fallback to console backend for development
+    if DEBUG:
+        EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
