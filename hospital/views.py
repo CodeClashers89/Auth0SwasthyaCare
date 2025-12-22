@@ -963,11 +963,11 @@ def bulk_reschedule_appointments(request, surgery_id):
                     related_appointment=appointment
                 )
                 
-                # Send email notification to patient
+                # Send email notification to patient (asynchronously)
                 try:
-                    from django.core.mail import EmailMultiAlternatives
                     from django.template.loader import render_to_string
                     from django.conf import settings
+                    from hospital.utils import send_email_async
                     
                     patient_email = appointment.patient.user.email
                     
@@ -988,23 +988,23 @@ def bulk_reschedule_appointments(request, surgery_id):
                         
                         # Render HTML email
                         html_content = render_to_string('hospital/emails/appointment_rescheduled.html', email_context)
+                        plain_content = f"Dear {email_context['patient_name']},\n\nYour appointment has been rescheduled. Please see the details in the HTML version of this email."
                         
-                        # Send email via Brevo SMTP
+                        # Send email asynchronously (non-blocking)
                         subject = 'Your Appointment Has Been Rescheduled - SwasthyaCare'
-                        email = EmailMultiAlternatives(
+                        send_email_async(
                             subject=subject,
-                            body=f"Dear {email_context['patient_name']},\n\nYour appointment has been rescheduled. Please see the details in the HTML version of this email.",
-                            from_email=settings.DEFAULT_FROM_EMAIL,
-                            to=[patient_email]
+                            html_content=html_content,
+                            plain_content=plain_content,
+                            to_email=[patient_email],
+                            from_email=settings.DEFAULT_FROM_EMAIL
                         )
-                        email.attach_alternative(html_content, "text/html")
-                        email.send(fail_silently=True)
                         
                 except Exception as e:
                     # Log error but don't block the reschedule process
                     import logging
                     logger = logging.getLogger(__name__)
-                    logger.warning(f"Failed to send email to {appointment.patient.user.email}: {str(e)}")
+                    logger.warning(f"Failed to queue email to {appointment.patient.user.email}: {str(e)}")
             
             messages.success(request, f'Successfully rescheduled {len(reschedule_data)} appointment(s). Patients have been notified via email and in-app notification.')
             return redirect('hospital:doctor_dashboard')
