@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'hospital',
+    'django.contrib.sites',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -64,6 +66,8 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -100,6 +104,34 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.auth0.Auth0OAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+# Auth0 / social-auth configuration
+# Use environment variables in production; defaults here are placeholders
+SOCIAL_AUTH_AUTH0_DOMAIN = 'dev-ysd8z0r02200w27x.us.auth0.com'
+SOCIAL_AUTH_AUTH0_KEY = 'SnrjS4vXwybZeSctVCP6CYNj5vKsVGWj'
+SOCIAL_AUTH_AUTH0_SECRET = 'a4Gh2Rl20aiToBZl4Ky8129nYFiDGU7LfLqsFLV59Q0cRA_AdBdFv9c8XvdFQ39a'
+
+# Request profile and email from Auth0
+SOCIAL_AUTH_AUTH0_SCOPE = [
+    'openid',
+    'profile',
+    'email',
+]
+
+# Don't append a trailing slash to redirect URIs
+SOCIAL_AUTH_TRAILING_SLASH = False
+
+# Redirects
+LOGIN_URL = 'hospital:login'
+LOGIN_REDIRECT_URL = 'hospital:home'
+LOGOUT_REDIRECT_URL = '/'
+
 
 
 # Internationalization
@@ -144,9 +176,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get("BREVO_SMTP_USER")  # Your Brevo login email
-EMAIL_HOST_PASSWORD = os.environ.get("BREVO_SMTP_PASSWORD")  # Your Brevo SMTP key
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+EMAIL_HOST_USER = os.environ.get("BREVO_SMTP_USER", "9e96b7001@smtp-brevo.com")  # Your Brevo login email
+EMAIL_HOST_PASSWORD = os.environ.get("BREVO_SMTP_PASSWORD", "xsmtpsib-cafa12b80fbdba788de6a68141ee0b71b561ab880b8c7b6944421949265e0405-H87fYsx6K3IOnwQo")  # Your Brevo SMTP key
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "clasherscode6@gmail.com")
 
 # Validate email configuration
 if not EMAIL_HOST_PASSWORD and not DEBUG:

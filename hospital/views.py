@@ -134,7 +134,7 @@ def patient_history(request, patient_id):
     """View patient's medical history"""
     patient = get_object_or_404(Patient, id=patient_id)
     appointments = Appointment.objects.filter(patient=patient).order_by('-appointment_date')
-    medical_records = MedicalRecord.objects.filter(patient=patient).order_by('-created_at')
+    medical_records = MedicalRecord.objects.filter(patient=patient).order_by('-created_at') 
     
     context = {
         'patient': patient,
@@ -166,7 +166,7 @@ def add_medical_record(request, appointment_id):
             medical_record.appointment = appointment
             medical_record.patient = appointment.patient
             medical_record.doctor = doctor
-            medical_record.save()
+            medical_record.save()                 
             messages.success(request, 'Medical record added successfully.')
             
             # Check if we need to perform an action after saving

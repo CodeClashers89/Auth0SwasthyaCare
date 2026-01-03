@@ -243,6 +243,13 @@
             <button type="submit" class="login-button">Login</button>
         </form>
 
+        <div style="text-align:center; margin-top:18px;">
+            <a href="{% url 'social:begin' 'auth0' %}?connection=google-oauth2" class="login-button"
+               style="background:#ffffff;color:#222;border:1px solid #ddd;display:inline-block;padding:12px 18px;margin-top:12px;">
+                Login with Google (Auth0)
+            </a>
+        </div>
+
     </div>
 </div>
 
