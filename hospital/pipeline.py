@@ -1,0 +1,46 @@
+"""
+Custom authentication pipeline for social-auth (Auth0)
+"""
+from social_core.exceptions import AuthForbidden
+from django.contrib import messages
+from django.shortcuts import redirect
+
+
+def check_patient_profile(backend, user, response, *args, **kwargs):
+    """
+    Check if a PATIENT user has a patient profile.
+    If not, prevent login and show an error message.
+    Also clean up the user session to allow the next user to log in.
+    """
+    if user and hasattr(user, 'role'):
+        # Only check for PATIENT role users
+        if user.role == 'PATIENT':
+            # Check if patient profile exists
+            try:
+                user.patient_profile
+                # Profile exists, allow login
+                return None
+            except Exception:
+                # Patient profile doesn't exist
+                # Delete the user account if it was just created (no social auth yet)
+                # This prevents orphaned accounts from accumulating
+                if not user.social_auth.exists():
+                    user.delete()
+                
+                # Raise AuthForbidden to prevent login and clean up session
+                raise AuthForbidden(
+                    backend,
+                    'Your patient profile does not exist. Please contact a receptionist to create your profile.'
+                )
+    
+    # For all other roles, allow login
+    return None
+
+
+def handle_auth_error(backend, user, response, *args, **kwargs):
+    """
+    Handle authentication errors gracefully
+    """
+    # This function can be used to log errors or perform cleanup
+    return None
+
