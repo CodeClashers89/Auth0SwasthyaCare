@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Surgery Approval | SwasthyaCare</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: rgba(211,255,240,0.53);
+            margin: 0;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background-color: #64cbab;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+            color: white;
+        }
+
+        .navbar-brand {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+
+        .logout {
+            background: #ef4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 85%;
+            margin: 40px auto;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            margin-bottom: 12px;
+        }
+
+        .label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .value {
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-warning {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        ul {
+            padding-left: 18px;
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        textarea, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .error {
+            font-size: 12px;
+            color: red;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #4285f4;
+            color: white;
+        }
+
+        @media(max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-brand">SwasthyaCare</div>
+</nav>
+
+<div class="container">
+
+    <h1>Surgery Approval</h1>
+    <p class="subtitle">Review and approve or reject this surgery request</p>
+
+    <!-- DETAILS + CONFLICTS -->
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">Surgery Details</div>
+
+            <div class="info-row"><span class="label">Type:</span> <span class="value">{{ surgery.surgery_type }}</span></div>
+            <div class="info-row"><span class="label">Patient:</span> <span class="value">{{ surgery.patient_name }}</span></div>
+            <div class="info-row"><span class="label">Date:</span> <span class="value">{{ surgery.surgery_date }}</span></div>
+            <div class="info-row"><span class="label">Time:</span>
+                <span class="value">{{ surgery.start_time|time:"h:i A" }} - {{ surgery.end_time|time:"h:i A" }}</span>
+            </div>
+            <div class="info-row"><span class="label">Requested By:</span>
+                <span class="value">{{ surgery.created_by.get_full_name }}</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Conflicting Appointments</div>
+
+            {% if conflicting_appointments %}
+                <div class="alert alert-warning">
+                    ⚠ {{ conflicting_appointments.count }} conflicting appointment(s)
+                </div>
+                <ul>
+                    {% for appointment in conflicting_appointments %}
+                    <li>
+                        <strong>{{ appointment.patient.patient_id }}</strong> –
+                        {{ appointment.patient.user.get_full_name }}
+                        ({{ appointment.appointment_time|time:"h:i A" }})
+                    </li>
+                    {% endfor %}
+                </ul>
+                <small>You must reschedule these if you approve.</small>
+            {% else %}
+                <div class="alert alert-success">
+                    ✅ No conflicts found
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- APPROVAL FORM -->
+    <div class="card" style="margin-top:25px;">
+        <div class="card-title">Approval Decision</div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="label">{{ form.status.label }}</label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                <div class="error">{{ form.status.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="label">{{ form.rejection_reason.label }}</label>
+                {{ form.rejection_reason }}
+                {% if form.rejection_reason.errors %}
+                <div class="error">{{ form.rejection_reason.errors }}</div>
+                {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-warning">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="buttons">
+                <a href="{% url 'hospital:view_pending_surgeries' %}" class="btn btn-secondary">
+                    Back
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    Submit Decision
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

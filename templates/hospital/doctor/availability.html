@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Availability - Swasthya Care</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            background-color: #e6fff7;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background-color: #64cbab;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+            color: white;
+        }
+
+        .navbar-brand {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .navbar-center {
+            display: flex;
+            gap: 40px;
+        }
+
+        .navbar-center a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .navbar-center a:hover {
+            opacity: 1;
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-logout {
+            background-color: #ef4444;
+            padding: 8px 18px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            padding: 40px 60px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* PAGE HEADER */
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* CARD */
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: #9ac2ea;
+            color: white;
+            padding: 20px 30px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        /* FORM */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #64cbab;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .checkbox-group {
+            align-items: left;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .time-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #7aa7df;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #9ca3af;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            padding: 6px 14px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #64cbab;
+            color: white;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .mt-3 {
+            margin-top: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .time-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-brand">SwasthyaCare</div>
+        <div class="navbar-center">
+            <a href="{% url 'hospital:doctor_dashboard' %}">Dashboard</a>
+            <a href="{% url 'hospital:doctor_appointments' %}">Appointments</a>
+            <a href="{% url 'hospital:view_surgeries' %}">Surgeries</a>
+            <a href="{% url 'hospital:manage_availability' %}">Availability</a>
+        </div>
+        <div class="navbar-right">
+            <span>{{ doctor.user.get_full_name }}</span>
+            <a href="{% url 'hospital:logout' %}" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="main-content">
+
+        <h1 class="page-title">Manage Availability</h1>
+        <p class="page-subtitle">Set lunch breaks and unavailable times</p>
+
+        <!-- ADD UNAVAILABILITY -->
+        <div class="card">
+            <div class="card-header">Add Unavailability</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label class="form-label">Type *</label>
+                        {{ form.availability_type }}
+                    </div>
+
+                    <div class="checkbox-group">
+                        {{ form.is_recurring }}
+                        <label>Recurring (Everyday)</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        {{ form.date }}
+                    </div>
+
+                    <div class="time-row">
+                        <div class="form-group">
+                            <label class="form-label">Start Time *</label>
+                            {{ form.start_time }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">End Time *</label>
+                            {{ form.end_time }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Reason</label>
+                        {{ form.reason }}
+                    </div>
+
+                    {% if form.errors %}
+                    <div class="empty-state">
+                        {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary">Add Unavailability</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- UPCOMING UNAVAILABILITIES -->
+        <div class="card">
+            <div class="card-header">Upcoming Unavailable Periods</div>
+            <div class="card-body">
+                {% if availabilities %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Reason</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for availability in availabilities %}
+                        <tr>
+                            <td>
+                                {% if availability.is_recurring %}
+                                <strong>Everyday</strong>
+                                {% else %}
+                                {{ availability.date }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ availability.start_time|time:"h:i A" }} –
+                                {{ availability.end_time|time:"h:i A" }}
+                            </td>
+                            <td>
+                                {{ availability.reason|default:"Not specified" }}
+                            </td>
+                            <td>
+                                <a href="{% url 'hospital:delete_availability' availability.id %}" class="btn-danger"
+                                    onclick="return confirm('Delete this unavailability?')">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    No unavailable periods set
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

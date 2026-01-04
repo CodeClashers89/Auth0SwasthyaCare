@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Reminder</title>
+</head>
+
+<body
+    style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 0;">
+    <div
+        style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 20px; margin-bottom: 20px;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #2563eb, #1e40af); padding: 30px 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 700;">🏥 SwasthyaCare</h1>
+            <p style="color: rgba(255, 255, 255, 0.9); margin-top: 5px; font-size: 16px;">Appointment Reminder</p>
+        </div>
+
+        <!-- Content -->
+        <div style="padding: 30px;">
+            <p style="font-size: 16px; margin-bottom: 20px;">Dear {{ patient_name }},</p>
+
+            <p style="margin-bottom: 25px;">This is a friendly reminder for your upcoming appointment with us tomorrow.
+            </p>
+
+            <!-- Appointment Details Card -->
+            <div
+                style="background-color: #f1f5f9; border-left: 4px solid #2563eb; border-radius: 4px; padding: 20px; margin-bottom: 25px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-weight: 600; width: 100px;">Date:</td>
+                        <td style="padding: 8px 0; color: #1e293b; font-weight: 600;">{{ appointment_date }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Time:</td>
+                        <td style="padding: 8px 0; color: #1e293b; font-weight: 600;">{{ appointment_time }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Doctor:</td>
+                        <td style="padding: 8px 0; color: #1e293b; font-weight: 600;">Dr. {{ doctor_name }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Department:</td>
+                        <td style="padding: 8px 0; color: #1e293b;">{{ specialization }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Location:</td>
+                        <td style="padding: 8px 0; color: #1e293b;">SwasthyaCare Hospital</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Important Info -->
+            <div
+                style="background-color: #fff7ed; border: 1px solid #fed7aa; border-radius: 4px; padding: 15px; margin-bottom: 25px;">
+                <p style="margin: 0; color: #9a3412; font-size: 14px;"><strong>Note:</strong> Please arrive 15 minutes
+                    before your scheduled time for check-in procedures.</p>
+            </div>
+
+            <p style="margin-bottom: 10px;">If you need to reschedule or cancel, please contact us immediately.</p>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{{ login_url }}"
+                    style="background-color: #2563eb; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Login
+                    to Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div
+            style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">
+            <p style="margin: 0 0 10px 0;">&copy; {% now "Y" %} SwasthyaCare Hospital. All rights reserved.</p>
+            <p style="margin: 0;">This is an automated message, please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+
+</html>
