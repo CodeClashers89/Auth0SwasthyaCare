@@ -36,6 +36,11 @@ def login_view(request):
             # Other roles, redirect normally
             return redirect('hospital:home')
     
+    # Check for Auth0 error in session (one-time display)
+    auth_error = request.session.pop('auth_error', None)
+    if auth_error:
+        messages.error(request, auth_error)
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')

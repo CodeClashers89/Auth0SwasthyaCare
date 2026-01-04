@@ -2,8 +2,6 @@
 Custom authentication pipeline for social-auth (Auth0)
 """
 from django.shortcuts import redirect
-from django.contrib import messages
-from django.urls import reverse
 
 
 def check_patient_profile(strategy, backend, user, response, *args, **kwargs):
@@ -27,12 +25,9 @@ def check_patient_profile(strategy, backend, user, response, *args, **kwargs):
                 if not user.social_auth.exists():
                     user.delete()
                 
-                # Store error message in session
+                # Store error in session for one-time display
                 request = strategy.request
-                messages.error(
-                    request,
-                    'Your patient profile does not exist. Please contact a receptionist to create your profile.'
-                )
+                request.session['auth_error'] = 'Your patient profile does not exist. Please contact a receptionist to create your profile.'
                 
                 # Return redirect to login page to stop the pipeline
                 # This will clean up the session and show the error
