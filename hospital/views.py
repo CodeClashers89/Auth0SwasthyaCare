@@ -21,7 +21,30 @@ def start(request):
 def login_view(request):
     """Login view for all users"""
     if request.user.is_authenticated:
-        return redirect('hospital:home')
+        # Check if patient without profile - log them out so they can log in again
+        if request.user.role == 'PATIENT':
+            try:
+                request.user.patient_profile
+                # Patient has profile, redirect normally
+                return redirect('hospital:home')
+            except Patient.DoesNotExist:
+                # Patient without profile - log them out so they can try logging in again
+                logout(request)
+                # Redirect to login page (error message will be set in home_view if needed)
+                return redirect('hospital:login')
+        else:
+            # Other roles, redirect normally
+            return redirect('hospital:home')
+    
+    # Check for Auth0 error in session (one-time display)
+    # Use pop to retrieve and remove in one operation
+    auth_error = request.session.pop('auth_error', None)
+    if auth_error:
+        messages.error(request, auth_error)
+    
+    # Ensure any lingering auth errors are cleared
+    if 'auth_error' in request.session:
+        del request.session['auth_error']
     
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -54,7 +77,15 @@ def home_view(request):
     elif request.user.role == 'RECEPTIONIST':
         return redirect('hospital:receptionist_dashboard')
     elif request.user.role == 'PATIENT':
-        return redirect('hospital:patient_dashboard')
+        # Check if patient profile exists
+        try:
+            request.user.patient_profile
+            return redirect('hospital:patient_dashboard')
+        except Patient.DoesNotExist:
+            # Patient profile doesn't exist - log them out and show error
+            logout(request)
+            messages.error(request, 'Your patient profile does not exist. Please contact a receptionist to create your profile.')
+            return redirect('hospital:login')
     elif request.user.role == 'ADMIN':
         return redirect('hospital:admin_dashboard')
     elif request.user.is_superuser:
@@ -134,7 +165,7 @@ def patient_history(request, patient_id):
     """View patient's medical history"""
     patient = get_object_or_404(Patient, id=patient_id)
     appointments = Appointment.objects.filter(patient=patient).order_by('-appointment_date')
-    medical_records = MedicalRecord.objects.filter(patient=patient).order_by('-created_at')
+    medical_records = MedicalRecord.objects.filter(patient=patient).order_by('-created_at') 
     
     context = {
         'patient': patient,
@@ -166,7 +197,7 @@ def add_medical_record(request, appointment_id):
             medical_record.appointment = appointment
             medical_record.patient = appointment.patient
             medical_record.doctor = doctor
-            medical_record.save()
+            medical_record.save()                 
             messages.success(request, 'Medical record added successfully.')
             
             # Check if we need to perform an action after saving
@@ -354,24 +385,35 @@ def delete_availability(request, availability_id):
     return redirect('hospital:manage_availability')
 
 #Patient Views
-@login_required
 @role_required('PATIENT')
 def patient_dashboard(request):
     """Patient dashboard with appointment history"""
-    patient = request.user.patient_profile
-    
-    # Get appointment history
-    appointments = Appointment.objects.filter(patient=patient).order_by('-appointment_date', '-appointment_time')
-    
-    # Get medical records
-    medical_records = MedicalRecord.objects.filter(patient=patient).order_by('-created_at')
-    
+
+    try:
+        patient = request.user.patient_profile  # related_name='patient_profile'
+    except Patient.DoesNotExist:
+        # Patient profile doesn't exist - log them out and show error
+        logout(request)
+        messages.error(request, 'Your patient profile does not exist. Please contact a receptionist to create your profile.')
+        return redirect('hospital:login')
+
+    appointments = Appointment.objects.filter(
+        patient=patient
+    ).order_by('-appointment_date', '-appointment_time')
+
+    medical_records = MedicalRecord.objects.filter(
+        patient=patient
+    ).order_by('-created_at')
+
     context = {
         'patient': patient,
         'appointments': appointments,
         'medical_records': medical_records,
     }
+
     return render(request, 'hospital/patient/dashboard.html', context)
+
+
 
 
 @login_required
