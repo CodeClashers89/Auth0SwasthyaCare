@@ -30,7 +30,8 @@ def login_view(request):
             except Patient.DoesNotExist:
                 # Patient without profile - log them out so they can try logging in again
                 logout(request)
-                # Don't show error message here - let them try logging in
+                # Redirect to login page (error message will be set in home_view if needed)
+                return redirect('hospital:login')
         else:
             # Other roles, redirect normally
             return redirect('hospital:home')
