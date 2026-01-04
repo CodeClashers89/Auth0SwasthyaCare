@@ -354,24 +354,45 @@ def delete_availability(request, availability_id):
     return redirect('hospital:manage_availability')
 
 #Patient Views
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import PatientProfile, Appointment, MedicalRecord
+from .decorators import role_required
+
+
 @login_required
 @role_required('PATIENT')
 def patient_dashboard(request):
     """Patient dashboard with appointment history"""
-    patient = request.user.patient_profile
-    
+
+    # ✅ Safely get or create patient profile
+    patient, created = PatientProfile.objects.get_or_create(
+        user=request.user
+    )
+
+    # Optional: if profile is newly created, you can redirect
+    # to a profile completion page instead of dashboard
+    # if created:
+    #     return redirect('hospital:complete_patient_profile')
+
     # Get appointment history
-    appointments = Appointment.objects.filter(patient=patient).order_by('-appointment_date', '-appointment_time')
-    
+    appointments = Appointment.objects.filter(
+        patient=patient
+    ).order_by('-appointment_date', '-appointment_time')
+
     # Get medical records
-    medical_records = MedicalRecord.objects.filter(patient=patient).order_by('-created_at')
-    
+    medical_records = MedicalRecord.objects.filter(
+        patient=patient
+    ).order_by('-created_at')
+
     context = {
         'patient': patient,
         'appointments': appointments,
         'medical_records': medical_records,
     }
+
     return render(request, 'hospital/patient/dashboard.html', context)
+
 
 
 @login_required

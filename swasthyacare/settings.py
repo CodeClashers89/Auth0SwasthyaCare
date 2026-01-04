@@ -113,9 +113,9 @@ AUTHENTICATION_BACKENDS = (
 )
 # Auth0 / social-auth configuration
 # Use environment variables in production; defaults here are placeholders
-SOCIAL_AUTH_AUTH0_DOMAIN = ''
-SOCIAL_AUTH_AUTH0_KEY = ''
-SOCIAL_AUTH_AUTH0_SECRET = ''
+SOCIAL_AUTH_AUTH0_DOMAIN = 'dev-ysd8z0r02200w27x.us.auth0.com'
+SOCIAL_AUTH_AUTH0_KEY = 'SnrjS4vXwybZeSctVCP6CYNj5vKsVGWj'
+SOCIAL_AUTH_AUTH0_SECRET = 'a4Gh2Rl20aiToBZl4Ky8129nYFiDGU7LfLqsFLV59Q0cRA_AdBdFv9c8XvdFQ39a'
 
 # Request profile and email from Auth0
 SOCIAL_AUTH_AUTH0_SCOPE = [
