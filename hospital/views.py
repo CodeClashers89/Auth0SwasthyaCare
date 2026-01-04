@@ -21,7 +21,19 @@ def start(request):
 def login_view(request):
     """Login view for all users"""
     if request.user.is_authenticated:
-        return redirect('hospital:home')
+        # Check if patient without profile - log them out so they can log in again
+        if request.user.role == 'PATIENT':
+            try:
+                request.user.patient_profile
+                # Patient has profile, redirect normally
+                return redirect('hospital:home')
+            except Patient.DoesNotExist:
+                # Patient without profile - log them out so they can try logging in again
+                logout(request)
+                # Don't show error message here - let them try logging in
+        else:
+            # Other roles, redirect normally
+            return redirect('hospital:home')
     
     if request.method == 'POST':
         username = request.POST.get('username')
