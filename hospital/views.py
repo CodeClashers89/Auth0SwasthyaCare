@@ -54,7 +54,15 @@ def home_view(request):
     elif request.user.role == 'RECEPTIONIST':
         return redirect('hospital:receptionist_dashboard')
     elif request.user.role == 'PATIENT':
-        return redirect('hospital:patient_dashboard')
+        # Check if patient profile exists
+        try:
+            request.user.patient_profile
+            return redirect('hospital:patient_dashboard')
+        except Patient.DoesNotExist:
+            # Patient profile doesn't exist - log them out and show error
+            logout(request)
+            messages.error(request, 'Your patient profile does not exist. Please contact a receptionist to create your profile.')
+            return redirect('hospital:login')
     elif request.user.role == 'ADMIN':
         return redirect('hospital:admin_dashboard')
     elif request.user.is_superuser:
@@ -354,33 +362,22 @@ def delete_availability(request, availability_id):
     return redirect('hospital:manage_availability')
 
 #Patient Views
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .models import PatientProfile, Appointment, MedicalRecord
-from .decorators import role_required
-
-
-@login_required
 @role_required('PATIENT')
 def patient_dashboard(request):
     """Patient dashboard with appointment history"""
 
-    # ✅ Safely get or create patient profile
-    patient, created = PatientProfile.objects.get_or_create(
-        user=request.user
-    )
+    try:
+        patient = request.user.patient_profile  # related_name='patient_profile'
+    except Patient.DoesNotExist:
+        # Patient profile doesn't exist - log them out and show error
+        logout(request)
+        messages.error(request, 'Your patient profile does not exist. Please contact a receptionist to create your profile.')
+        return redirect('hospital:login')
 
-    # Optional: if profile is newly created, you can redirect
-    # to a profile completion page instead of dashboard
-    # if created:
-    #     return redirect('hospital:complete_patient_profile')
-
-    # Get appointment history
     appointments = Appointment.objects.filter(
         patient=patient
     ).order_by('-appointment_date', '-appointment_time')
 
-    # Get medical records
     medical_records = MedicalRecord.objects.filter(
         patient=patient
     ).order_by('-created_at')
@@ -392,6 +389,7 @@ def patient_dashboard(request):
     }
 
     return render(request, 'hospital/patient/dashboard.html', context)
+
 
 
 
