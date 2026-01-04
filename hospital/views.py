@@ -37,9 +37,14 @@ def login_view(request):
             return redirect('hospital:home')
     
     # Check for Auth0 error in session (one-time display)
+    # Use pop to retrieve and remove in one operation
     auth_error = request.session.pop('auth_error', None)
     if auth_error:
         messages.error(request, auth_error)
+    
+    # Ensure any lingering auth errors are cleared
+    if 'auth_error' in request.session:
+        del request.session['auth_error']
     
     if request.method == 'POST':
         username = request.POST.get('username')
