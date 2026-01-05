@@ -11,6 +11,8 @@ A comprehensive Django-based hospital management application with role-based acc
 - Mark appointments as complete or no-show
 - Create follow-up appointments
 - Set lunch breaks (max 1 hour) and mark unavailable dates/times
+- **🚨 Urgent Surgery Management**: Create urgent surgery requests (auto-approved) and manage conflicting appointments through bulk rescheduling.
+- **Review Pending Surgeries**: Approve or reject urgent surgery requests created by receptionists.
 
 ### 📋 Receptionist Features
 - Register new patients with complete medical information
@@ -19,24 +21,34 @@ A comprehensive Django-based hospital management application with role-based acc
 - Check doctor availability before booking
 - View all booked appointments with filtering options
 - Manage doctor availability settings
+- **Urgent Surgery Requests**: Initiate urgent surgery requests for doctors (requires doctor approval).
 
 ### 👤 Patient Features
 - View appointment history timeline
 - Access medical records from past appointments
-- Check doctor availability (cannot book appointments directly)
+- Check doctor availability
 - View personal and medical information
+- **� Healthcare Assistant (Chatbot)**:
+    - View upcoming and past appointments
+    - List available doctors and their specializations
+    - Check real-time doctor availability
+    - **Self-Service Booking**: Directly book appointments through the conversational interface.
 
-### 👨‍💼 Superuser Features
-- Full admin panel access
-- Create and manage all users (Doctors, Receptionists, Patients)
-- Complete CRUD operations on all models
+### 👨‍💼 Admin Features
+- Full admin dashboard access
+- Create and manage Doctors and Receptionists
+- View hospital-wide statistics
+- Complete CRUD operations on users and medical records
 
 ## Technology Stack
 
-- **Backend**: Django 5.2.8
-- **Database**: SQLite (default)
-- **Frontend**: Pure HTML & CSS (no JavaScript)
-- **Authentication**: Django's built-in auth with custom user roles
+- **Backend**: Django 6.0
+- **Database**: SQLite (default) / PostgreSQL (production ready)
+- **Authentication**: Role-based access with **Auth0 Integration** and custom user profiles
+- **Email**: Automated notifications via **Brevo SMTP**
+- **Frontend**: Responsive HTML & Modern Vanilla CSS
+- **Interactivity**: Dynamic JavaScript for Chatbot and UI components
+- **Deployment**: Ready for Render with WhiteNoise static file management
 
 ## Installation & Setup
 
@@ -113,9 +125,11 @@ SwasthyaCare/
 ├── hospital/                 # Main application
 │   ├── models.py            # Database models
 │   ├── views.py             # View functions
+│   ├── api_views.py         # Chatbot API logic
 │   ├── forms.py             # Django forms
 │   ├── admin.py             # Admin configuration
 │   ├── decorators.py        # Role-based access decorators
+│   ├── pipeline.py          # Auth0 social pipeline customization
 │   └── urls.py              # URL routing
 ├── templates/               # HTML templates
 │   ├── base.html           # Base template
@@ -166,6 +180,16 @@ Extended Django user model with role field (DOCTOR, RECEPTIONIST, PATIENT, SUPER
 - Unavailable dates and times
 - Reason for unavailability
 
+### UrgentSurgery
+- Specific surgeries scheduled by doctors or receptionists
+- Links to doctor and patient
+- Status tracking (PENDING, APPROVED, COMPLETED)
+- Conflict detection for existing appointments
+
+### Notification
+- Real-time alerts for surgery approvals and appointment updates
+- Role-specific notification delivery
+
 ## Key Features Implementation
 
 ### Patient ID Generation
@@ -181,7 +205,12 @@ Extended Django user model with role field (DOCTOR, RECEPTIONIST, PATIENT, SUPER
 ### Doctor Availability
 - Doctors can set lunch breaks (limited to 1 hour)
 - Mark specific dates/times as unavailable
-- System checks availability during appointment booking
+- System checks availability during appointment booking and surgery scheduling
+
+### Auth0 Integration
+- Secure social login and profile synchronization
+- Custom pipeline to ensure patient profiles exist upon registration
+- Role-based redirection logic integrated with Auth0 flows
 
 ### Role-Based Access Control
 - Custom decorator `@role_required()` for view protection
@@ -260,13 +289,10 @@ Extended Django user model with role field (DOCTOR, RECEPTIONIST, PATIENT, SUPER
 
 ## Future Enhancements
 
-- Email notifications for appointments
-- SMS reminders
-- Online appointment booking for patients
-- Prescription printing
-- Medical report analytics
-- Billing and payment integration
 - Multi-language support
+- Patient medical report analytics
+- Advanced billing and payment integration
+- Mobile application (iOS/Android)
 
 ## Troubleshooting
 
@@ -288,14 +314,5 @@ python manage.py setup_demo_data
 python manage.py runserver 8001
 ```
 
-## License
-
-This project is created for educational purposes.
-
-## Support
-
-For issues or questions, please contact the development team.
-
----
 
 **SwasthyaCare** - Caring for your health, managing with ease! 🏥
